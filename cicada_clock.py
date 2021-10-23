@@ -32,7 +32,7 @@ from aiy.cloudspeech import CloudSpeechClient
 
 from threading import Timer,Thread,Event
 
-global parser, args, hints, client, activeListening, board, leds, currTime, numRings
+global parser, args, hints, client, board, leds, currTime, numRings
 numRings = 18
 
 
@@ -46,19 +46,11 @@ def locale_language():
     return language
 
 def _on_button_pressed():
-    global activeListening, board, logging, leds
+    global board, logging, leds
 
-    if activeListening:
-        activeListening = False
-        logging.info('Not listening')
-        # board.led.state = Led.ON
-        leds.update(Leds.rgb_on((9, 99, 21)))
-    else:
-        activeListening = True
-        # board.led.state = Led.BLINK;
-        leds.pattern = Pattern.blink(500)
-        leds.update(Leds.rgb_pattern((9, 99, 21)))
-        runConversation()
+    leds.pattern = Pattern.blink(500)
+    leds.update(Leds.rgb_pattern((9, 99, 21)))
+    runConversation()
 
 
 class sunTimer():
@@ -93,13 +85,11 @@ def ringCicada():
 
     if currTime.tm_hour > sunrise and currTime.tm_hour < sunset:
         numRings = currTime.tm_hour - sunrise
-        print(currTime.tm_hour)
-        print(numRings)
         filename = "/home/pi/Music/neotibicen-pruinosus-loop-" + str(numRings) + ".wav"
         aiy.voice.audio.play_wav(filename)
 
 def runConversation():
-    global activeListening, board, args, hints, client, leds
+    global board, args, hints, client, leds
 
     if hints:
         logging.info('Say something, e.g. %s.' % ', '.join(hints))
@@ -116,31 +106,18 @@ def runConversation():
     logging.info('You said: "%s"' % text)
     text = text.lower()
     # aiy.voice.tts.say(text)
-    activeListening = False;
 
     if 'what time is it' in text:
         ringCicada()
-        # aiy.voice.tts.say("It is time to call for a mate", "en-US", 10)
-        # aiy.voice.audio.play_wav("/home/pi/neotibicen-pruinosus-wav.wav")
 
-    #elif 'turn off the light' in text:
-    #    board.led.state = Led.OFF
-    #elif 'blink the light' in text:
-    #    board.led.state = Led.BLINK
-    # elif 'goodbye' in text:
-    #     break
-
-    # board.led.state = Led.ON
     leds.update(Leds.rgb_on((9, 99, 21)))
     logging.info('Not listening')
 
 def main():
-    global args, hints, client, parser, board, activeListening, leds
+    global args, hints, client, parser, board, leds
 
-    activeListening = False
     board = Board()
     leds = Leds()
-    #leds.update(Leds.rgb_on((9, 99, 21)))
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -154,7 +131,7 @@ def main():
 
     board.button.when_pressed = _on_button_pressed
     leds.update(Leds.rgb_on((9, 99, 21)))
-    # board.led.state = Led.ON;
+
     # aiy.voice.tts.say("I am the cicada.", "en-US", 10)
 
     logging.info('ready!!!!!!!!!')
