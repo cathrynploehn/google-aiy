@@ -6,4 +6,4 @@
 
 **cat_cloudspeech_functionality_demo.py** is test code for speech-to-text and button capabilities for the AIY Voice kit.
 
-**cat_cloudspeech_functionality_demo.py** is test code for the AIY Vision kit that uses image classification (modifed from the Joy Detector). 
+**cat_classification_demo.py** is test code for the AIY Vision kit that uses image classification (modifed from the Joy Detector).
