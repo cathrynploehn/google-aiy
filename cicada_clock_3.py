@@ -4,7 +4,6 @@
 import argparse
 import locale
 import logging
-import schedule
 import time
 
 import aiy.voice.tts
@@ -22,17 +21,7 @@ def locale_language():
 
 # trigger something when you press the button
 def _on_button_pressed():
-    leds.pattern = Pattern.blink(500)
-    leds.update(Leds.rgb_pattern((9, 99, 21)))
     runConversation()
-
-def ask_break(musicPlaying):
-    logging.info("checking for break")
-
-    if musicPlaying == False:
-        aiy.voice.tts.say("don't forget to take a break.", "en-US", 10)
-    else:
-        logging.info("no break")
 
 # play any wav file
 def playSound(filename):
@@ -43,6 +32,9 @@ def playSound(filename):
 # handles the listening and response
 def runConversation():
     global client, leds, args
+
+    leds.pattern = Pattern.blink(500)
+    leds.update(Leds.rgb_pattern((9, 99, 21)))
 
     logging.info('Say something: play a sound, turn off the light, blink the light, turn on the light, say something')
 
@@ -55,29 +47,14 @@ def runConversation():
     text = text.lower()
 
     # you can use any .wav file. Use Adobe Audition, etc. to convert files
-    if 'play a sound' in text:
+    if "what time is it" in text:
         playSound("/home/pi/Music/neotibicen-pruinosus-loop.wav")
-        leds.update(Leds.rgb_on((9, 99, 21)))
 
-    # light options
-    # more options listed on the API: https://aiyprojects.readthedocs.io/en/latest/aiy.leds.html
-    elif 'turn off the light' in text:
-        leds.update(Leds.rgb_off())
-    elif 'blink the light' in text:
-        leds.pattern = Pattern.blink(500)
-        # use RGB numbers from 0 to 255 to light the button different colors
-        leds.update(Leds.rgb_pattern((9, 99, 21)))
-    elif 'turn on the light' in text:
-        leds.update(Leds.rgb_on((9, 99, 21)))
-
-    # the robot can say anything in respose to any prompt. Build a conversation
-    elif 'say something' in text:
-        aiy.voice.tts.say("Something.", "en-US", 10)
-
-    elif 'when am I going to leave class' in text:
-        aiy.voice.tts.say("Never.", "en-US", 10)
+    else:
+        aiy.voice.tts.say("I don't know", "en-US", 50)
 
     logging.info('Not listening')
+    leds.update(Leds.rgb_on((9, 99, 21)))
 
 # sets up the speech client
 def main():
@@ -85,7 +62,6 @@ def main():
 
     board = Board()
     leds = Leds()
-    musicPlaying = False;
 
     logging.basicConfig(level=logging.DEBUG)
 
@@ -98,8 +74,6 @@ def main():
 
     board.button.when_pressed = _on_button_pressed
     leds.update(Leds.rgb_on((9, 99, 21)))
-
-    schedule.every(2).seconds.do(ask_break, musicPlaying=musicPlaying)
 
     logging.info('ready!!!!!!!!!')
 
